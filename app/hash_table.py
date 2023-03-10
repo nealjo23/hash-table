@@ -1,4 +1,4 @@
-from math import sqrt
+from math import sqrt, gcd
 from hash_entry import HashEntry
 
 
@@ -57,40 +57,50 @@ class HashTable:
             h1 = (h1 + h2) % self.TABLE_SIZE
             tries += 1
             if tries > self.TABLE_SIZE:
-                tries += 1
+                tries *= 1
         self.table[h1] = HashEntry(key, value)
         self.size += 1
 
+    def my_hash(self, key_string):
+        ascii_sum = 0
+        for ch in key_string:
+            ascii_sum += (ord(ch) - 96)
+        return ascii_sum % self.TABLE_SIZE
+
     def hash1(self, s):
         """Create hash value for a string s."""
-        hash_val = hash(s) % self.TABLE_SIZE
+        # hash_val = hash(s) % self.TABLE_SIZE
+        hash_val = self.my_hash(s)
         # return hash_val if hash_val >= 0 else hash_val + self.TABLE_SIZE
         # hash can yield -ve vals but % will always be +ve
-        return hash_val
+        return hash_val % self.TABLE_SIZE
 
     def hash2(self, h1):
         """Create the second hash value based on the original hash. The original is calculated using hash1."""
-        return self.prime_size - h1 % self.prime_size
+        # return self.prime_size - h1 % self.prime_size
+        return self.prime_size - (h1 % self.prime_size)
 
 
 if __name__ == '__main__':
     import random
     from string import ascii_letters
+
     """The prime numbers from 1 to 200 are: 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 
     73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 
     197, 199."""
-    TABLE_SIZE = 139
-    KEY_SIZE = 3
-    VALUE_LEN = 10
-    RUNS, ENTRIES_PER_RUN = 1000, 10
-
-    for i in range(RUNS):
-        hash_table = HashTable(TABLE_SIZE)
-        # for j in range(ENTRIES_PER_RUN):
-        for j in range(TABLE_SIZE):
-            key = ''.join(random.sample(ascii_letters, KEY_SIZE))
-            value = f'run={i}:entry{j} ' + ''.join(random.sample(ascii_letters, VALUE_LEN))
-            hash_table.insert(key, value)
+    # TABLE_SIZE = 10
+    # KEY_SIZE = 3
+    # VALUE_LEN = 10
+    # RUNS = 1000
+    # # ENTRIES_PER_RUN = 10
+    #
+    # for i in range(RUNS):
+    #     hash_table = HashTable(TABLE_SIZE)
+    #     # for j in range(ENTRIES_PER_RUN):
+    #     for j in range(TABLE_SIZE):
+    #         key_str = ''.join(random.sample(ascii_letters, KEY_SIZE))
+    #         value_str = f'run={i}:entry{j} ' + ''.join(random.sample(ascii_letters, VALUE_LEN))
+    #         hash_table.insert(key_str, value_str)
     # hash_table = HashTable(13)
     # hash_table.insert("John", "John Doe")
     # hash_table.insert("Jane", "Jane Doe")
@@ -104,4 +114,14 @@ if __name__ == '__main__':
     # hash_table.insert("assaJane", "Ja356567ne Doe")
     # hash_table.insert("Janfvcxve", "Ja4343543ne Doe")
 
-    print(hash_table)
+    # print(hash_table)
+    T_SIZE = 11
+    hash_table = HashTable(T_SIZE)
+    for i in range(T_SIZE):
+        h2 = hash_table.hash2(i)
+        print(f"i-{i} h2(i)={h2} i%7={i % 7} gcd({h2},10)={gcd(h2,T_SIZE)}")
+        j = i
+        for k in range(T_SIZE):
+            print(f" {j}", end='')
+            j = (j + h2) % T_SIZE
+        print()
