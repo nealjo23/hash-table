@@ -2,7 +2,7 @@ from math import sqrt
 from hash_entry import HashEntry
 
 
-# John Neal 20003366
+# John Neal
 # 10/3/2023
 # This hash-tables sample code from Blackboard uses double hashing.
 # Double hashing is to resolve collisions - i.e. when the hashed key index is already filled.
@@ -89,6 +89,9 @@ class HashTable:
     def __hash1(self, s):
         """Create hash value for a string s
         """
+        # The built-in hash function used here is the wrong choice as it does not produce the same value
+        # for a key between sessions and thus retrievals are actually impossible...
+        # The purpose of this built-in hash function is to compare 2 objects by comparing their hash values.
         hash_val = hash(s) % self.__TABLE_SIZE
         # Modulo division on +ve value can only return +ve value, so condition is redundant - just return hash_val
         return hash_val if hash_val >= 0 else hash_val + self.__TABLE_SIZE
@@ -118,6 +121,7 @@ if __name__ == '__main__':
     hash_table = HashTable(10)
     # To find the next prime after a given number, use sympy.ntheory.generate.nextprime(n)
 
+    # More test data is required. Should test right up to a full table.
     hash_table.insert("John", "John Doe")
     hash_table.insert("Jane", "Jane Doe")
 
