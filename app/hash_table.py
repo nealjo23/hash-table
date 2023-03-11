@@ -115,11 +115,12 @@ if __name__ == '__main__':
     # hash_table.insert("Janfvcxve", "Ja4343543ne Doe")
 
     # print(hash_table)
+    from math import gcd
     T_SIZE = 11
     hash_table = HashTable(T_SIZE)
     for i in range(T_SIZE):
         h2 = hash_table.hash2(i)
-        print(f"i-{i} h2(i)={h2} i%7={i % 7} gcd({h2},10)={gcd(h2,T_SIZE)}")
+        print(f"i-{i} h2(i)={h2} i%7={i % 7} gcd({h2},{T_SIZE})={gcd(h2,T_SIZE)}")
         j = i
         for k in range(T_SIZE):
             print(f" {j}", end='')
