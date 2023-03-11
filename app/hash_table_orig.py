@@ -8,7 +8,7 @@ from hash_entry import HashEntry
 # Double hashing is to resolve collisions - i.e. when the hashed key index is already filled.
 # In this case, the 2nd hash value is an offset to add to the first index to look for an empty slot.
 # If the new slot is filled, the offset is added again and again until an empty slot is found.
-# When the end of the array is reached, modulo division with the array size sets the back to the start of the array.
+# At the end of the array, modulo division with the array size sets the index back to the start of the array.
 #
 # The problem with this example is that the array size is not a prime number.  This means it is possible for
 # the 2nd hash value and the array size to have a common divisor > 1.  If this occurs when the hash table is not empty,
