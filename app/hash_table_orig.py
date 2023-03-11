@@ -2,10 +2,31 @@ from math import sqrt
 from hash_entry import HashEntry
 
 
+# John Neal 20003366
+# 10/3/2023
+# This hash-tables sample code from Blackboard uses double hashing.
+# Double hashing is to resolve collisions - i.e. when the hashed key index is already filled.
+# In this case, the 2nd hash value is an offset to add to the first index to look for an empty slot.
+# If the new slot is filled, the offset is added again and again until an empty slot is found.
+# When the end of the array is reached, modulo division with the array size sets the back to the start of the array.
+#
+# The problem with this example is that the array size is not a prime number.  This means it is possible for
+# the 2nd hash value and the array size to have a common divisor > 1.  If this occurs when the hash table is not empty,
+# the search for an empty slot can get into an infinite loop of looking at the same slots over and over without
+# checking the empty slots.
+# When table size is a prime, the 2nd hash value and the table size will have a greatest common divisor of 1, ensuring
+# all slots are checked when hopping around searching for an empty slot.
+
+# While researching this topic, I found that the algorithm in this code is __identical__ to the code
+# shown on the following link:
+#  https://www.topcoder.com/thrive/articles/double-hashing
+
+# Other issues with this code are described within the code below.
+
+
 class HashTable:
     def __init__(self, ts):
-        # should not use __ for private vars
-        # in this case, private vars not even necessary
+        # Should use _ not __ for private vars
 
         self.__size = 0
         self.__TABLE_SIZE = ts
@@ -15,22 +36,23 @@ class HashTable:
     def insert(self, key, value):
         """Insert a key value pair into the hash table
         """
-        # one-liner docstrings should be on one line and end with .
+        # One-liner docstrings should be on one line and end with . (https://peps.python.org/pep-0257/)
 
         if self.__size == self.__TABLE_SIZE:
             raise RuntimeError("Table full!")
 
-        # bad practice to use the same names for methods and local vars
+        # Bad practice to use the same names for methods and local vars
         hash1 = self.__hash1(key)
         hash2 = self.__hash2(hash1)
 
         while self.__table[hash1] is not None:
-            # this is where the infinite loop occurs if table size is not prime
+            # This is where the infinite loop sometimes occurs if table size is not prime
             hash1 = (hash1 + hash2) % self.__TABLE_SIZE
 
         self.__table[hash1] = HashEntry(key, value)
         self.__size += 1
-        # at this point, the load factor should be considered and the table extended if over threshold
+        # At this point, the load factor should be considered and the table extended if over some threshold.
+        # Expand the table so the size is the next prime after double the current size
 
     def remove(self, key):
         """Remove a key value pair from the hash table
@@ -44,14 +66,14 @@ class HashTable:
         while self.__table[hash1] is not None and self.__table[hash1].key != key:
             hash1 = (hash1 + hash2) % self.__TABLE_SIZE
 
-        self.__table[hash1] = None  # should leave a tombstone to let this func or a search func (if it existed) know
-                                    # to keep looking
+        # Should leave a tombstone to let this func (or a search func if it existed) know to keep looking next time
+        self.__table[hash1] = None
         self.__size -= 1
 
     def __get_prime(self):
         """Function to get a prime number less than table size
         """
-        # could import and use sympy.ntheory.generate.prevprime(n)
+        # Could import and use sympy.ntheory.generate.prevprime(n) to find next prime number down
         for i in range(self.__TABLE_SIZE - 1, 0, -1):
             fact = False
             for j in range(2, int(sqrt(i)) + 1):
@@ -68,7 +90,7 @@ class HashTable:
         """Create hash value for a string s
         """
         hash_val = hash(s) % self.__TABLE_SIZE
-        # % operator only returns positive numbers, so next line should just return hash_val
+        # Modulo division on +ve value can only return +ve value, so condition is redundant - just return hash_val
         return hash_val if hash_val >= 0 else hash_val + self.__TABLE_SIZE
 
     def __hash2(self, h):
@@ -76,28 +98,26 @@ class HashTable:
 
         The original is calculated using hash1
         """
-        # next line should have () around h % self.__prime_size for clarity/readability
+        # Next line should have () around h % self.__prime_size for clarity/readability
         return self.__prime_size - h % self.__prime_size
 
     def __str__(self):
-        # should never have print in __str__
         s = ""
         for i in range(self.__TABLE_SIZE):
             if self.__table[i] is not None:
-                # the next line would be simpler if HashEntry had a __str__ func
+                # Should never use print in __str__
+                # Also, would be simpler if HashEntry had a __str__ func
+                # Should be s += f"{self.__table[i] } "
                 print(self.__table[i].key, self.__table[i].value)
 
-        return s  # s is always empty
+        return s
 
 
 if __name__ == '__main__':
-    # when double hashing as this module is, the table size must be a prime number or an infinite loop can
-    # occur when trying to resolve collisions.
-    # When table size is not a prime, the 2nd hash value and the table size will have a greatest common divisor
-    # greater than 1 causing empty slots to be missed when hopping searching for the next empty slot.
-    # sympy.ntheory.generate.nextprime(n, ith=1)[source] will find the next prime
+    # Hash table size should be prime.
     hash_table = HashTable(10)
-    # this is insufficient test data
+    # To find the next prime after a given number, use sympy.ntheory.generate.nextprime(n)
+
     hash_table.insert("John", "John Doe")
     hash_table.insert("Jane", "Jane Doe")
 
